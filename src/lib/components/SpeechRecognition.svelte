@@ -19,6 +19,9 @@
 				.map((result) => result[0])
 				.map((result) => result.transcript)
 				.join('');
+			console.log(text);
+
+			sendToDiscord(text, 'discord access token');
 
 			p.innerText = text;
 			if (e.results[0].isFinal) {
@@ -51,10 +54,35 @@
 		});
 
 		recognition.start();
-
-		console.log(recognition);
 	});
-	console.log(recognition);
+
+	function sendToDiscord(text: any, accessToken: any) {
+		const url = 'https://discord.com/api/v9/channels/1142991599941464104/messages';
+		// Replace 'CHANNEL_ID' with the actual channel ID in your Discord server
+
+		const payload = {
+			content: text
+		};
+
+		fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bot ${accessToken}`
+			},
+			body: JSON.stringify(payload)
+		})
+			.then((response) => {
+				if (response.ok) {
+					console.log('Message sent to Discord!');
+				} else {
+					console.error('Failed to send message to Discord:', response.status, response.statusText);
+				}
+			})
+			.catch((error) => {
+				console.error('Failed to send message to Discord:', error);
+			});
+	}
 </script>
 
 <section>
