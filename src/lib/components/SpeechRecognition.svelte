@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	let texts;
-	let recognition;
+	// import { send } from 'vite';
+	let texts: any;
+
+	const discord_access_token = ''; //discord access token
+	const discord_channel = ''; //discord channel id
+	let message = '';
 
 	onMount(() => {
 		texts = document.querySelector('.texts');
@@ -14,37 +18,17 @@
 		let p = document.createElement('p');
 
 		recognition.addEventListener('result', (e) => {
-			texts.appendChild(p);
+			// texts.appendChild(p);
 			const text = Array.from(e.results)
 				.map((result) => result[0])
 				.map((result) => result.transcript)
 				.join('');
 			console.log(text);
-
-			sendToDiscord(text, 'discord access token');
-
 			p.innerText = text;
+			p.appendChild(p);
+			sendToDiscord(text, discord_access_token);
+
 			if (e.results[0].isFinal) {
-				if (text.includes('how are you')) {
-					p = document.createElement('p');
-					p.classList.add('replay');
-					p.innerText = 'I am fine';
-					texts.appendChild(p);
-				}
-				if (text.includes("what's your name") || text.includes('what is your name')) {
-					p = document.createElement('p');
-					p.classList.add('replay');
-					p.innerText = 'My Name is Cifar';
-					texts.appendChild(p);
-				}
-				if (text.includes('open my YouTube')) {
-					p = document.createElement('p');
-					p.classList.add('replay');
-					p.innerText = 'opening youtube channel';
-					texts.appendChild(p);
-					console.log('opening youtube');
-					window.open('https://www.youtube.com/channel/UCdxaLo9ALJgXgOUDURRPGiQ');
-				}
 				p = document.createElement('p');
 			}
 		});
@@ -55,10 +39,17 @@
 
 		recognition.start();
 	});
+	// function send() {
+	// 	const p = document.createElement('p');
+	// 	p.innerText = message;
+	// 	texts.appendChild(p);
+
+	// 	sendToDiscord(message, discord_access_token);
+	// }
 
 	function sendToDiscord(text: any, accessToken: any) {
-		const url = 'https://discord.com/api/v9/channels/1142991599941464104/messages';
-		// Replace 'CHANNEL_ID' with the actual channel ID in your Discord server
+		const url = `https://discord.com/api/v9/channels/${discord_channel}/messages`;
+		//discord_channel id
 
 		const payload = {
 			content: text
@@ -68,7 +59,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bot ${accessToken}`
+				Authorization: accessToken
 			},
 			body: JSON.stringify(payload)
 		})
@@ -89,6 +80,9 @@
 	<h1>Speech<br /> Recognition</h1>
 	<p>Available In Chrome😎 Only</p>
 	<div class="container">
+		<!-- <input type="text" bind:value={message} />
+		<button on:click={send}>Submit</button> -->
+
 		<div class="texts" />
 	</div>
 </section>
@@ -122,7 +116,7 @@
 		margin: 0 auto;
 		justify-content: center;
 	}
-	.texts p {
+	:global(.texts p) {
 		color: black;
 		text-align: left;
 		width: 100%;
