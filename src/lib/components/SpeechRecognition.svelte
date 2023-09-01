@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	let texts;
-	let recognition;
+	// import { send } from 'vite';
+	let texts: any;
+
+	const discord_access_token = ''; //discord access token
+	const discord_channel = ''; //discord channel id
+	let message = '';
 
 	onMount(() => {
 		texts = document.querySelector('.texts');
@@ -14,34 +18,17 @@
 		let p = document.createElement('p');
 
 		recognition.addEventListener('result', (e) => {
-			texts.appendChild(p);
+			// texts.appendChild(p);
 			const text = Array.from(e.results)
 				.map((result) => result[0])
 				.map((result) => result.transcript)
 				.join('');
-
+			console.log(text);
 			p.innerText = text;
+			texts.appendChild(p);
+			sendToDiscord(text, discord_access_token);
+
 			if (e.results[0].isFinal) {
-				if (text.includes('how are you')) {
-					p = document.createElement('p');
-					p.classList.add('replay');
-					p.innerText = 'I am fine';
-					texts.appendChild(p);
-				}
-				if (text.includes("what's your name") || text.includes('what is your name')) {
-					p = document.createElement('p');
-					p.classList.add('replay');
-					p.innerText = 'My Name is Cifar';
-					texts.appendChild(p);
-				}
-				if (text.includes('open my YouTube')) {
-					p = document.createElement('p');
-					p.classList.add('replay');
-					p.innerText = 'opening youtube channel';
-					texts.appendChild(p);
-					console.log('opening youtube');
-					window.open('https://www.youtube.com/channel/UCdxaLo9ALJgXgOUDURRPGiQ');
-				}
 				p = document.createElement('p');
 			}
 		});
@@ -51,10 +38,35 @@
 		});
 
 		recognition.start();
-
-		console.log(recognition);
 	});
-	console.log(recognition);
+
+	function sendToDiscord(text: any, accessToken: any) {
+		const url = `https://discord.com/api/v9/channels/${discord_channel}/messages`;
+		//discord_channel id
+
+		const payload = {
+			content: text
+		};
+
+		fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: accessToken
+			},
+			body: JSON.stringify(payload)
+		})
+			.then((response) => {
+				if (response.ok) {
+					console.log('Message sent to Discord!');
+				} else {
+					console.error('Failed to send message to Discord:', response.status, response.statusText);
+				}
+			})
+			.catch((error) => {
+				console.error('Failed to send message to Discord:', error);
+			});
+	}
 </script>
 
 <section>
@@ -94,7 +106,7 @@
 		margin: 0 auto;
 		justify-content: center;
 	}
-	.texts p {
+	:global(.texts p) {
 		color: black;
 		text-align: left;
 		width: 100%;
