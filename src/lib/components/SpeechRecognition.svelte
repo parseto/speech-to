@@ -25,7 +25,7 @@
 				.join('');
 			console.log(text);
 			p.innerText = text;
-			p.appendChild(p);
+			texts.appendChild(p);
 			sendToDiscord(text, discord_access_token);
 
 			if (e.results[0].isFinal) {
@@ -39,13 +39,6 @@
 
 		recognition.start();
 	});
-	// function send() {
-	// 	const p = document.createElement('p');
-	// 	p.innerText = message;
-	// 	texts.appendChild(p);
-
-	// 	sendToDiscord(message, discord_access_token);
-	// }
 
 	function sendToDiscord(text: any, accessToken: any) {
 		const url = `https://discord.com/api/v9/channels/${discord_channel}/messages`;
@@ -80,9 +73,6 @@
 	<h1>Speech<br /> Recognition</h1>
 	<p>Available In Chrome😎 Only</p>
 	<div class="container">
-		<!-- <input type="text" bind:value={message} />
-		<button on:click={send}>Submit</button> -->
-
 		<div class="texts" />
 	</div>
 </section>
